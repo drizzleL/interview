@@ -75,7 +75,7 @@ func main() {
 	}()
 	// p(modifiedGraphEdges(5, toIntInt("[[4,1,-1],[2,0,-1],[0,3,-1],[4,3,-1]]"), 0, 1, 5))
 	// p(modifiedGraphEdges(5, toIntInt("[[1,4,1],[2,4,-1],[3,0,2],[0,4,-1],[1,3,10],[1,0,10]]"), 0, 2, 15))
-	p(countPairs4(7, toIntInt("[[0,2],[0,5],[2,4],[1,6],[5,4]]")))
+	p(deleteAndEarn([]int{3, 4, 2}))
 
 }
 
