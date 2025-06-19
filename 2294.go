@@ -4,14 +4,12 @@ import "sort"
 
 func partitionArray(nums []int, k int) int {
 	sort.Ints(nums)
-	leftIdx := 0
 	ret := 1
-	for i, num := range nums {
-		if num-nums[leftIdx] <= k {
-			continue
+	for last, i := nums[0], 1; i < len(nums); i++ {
+		if nums[i]-last > k {
+			ret++
+			last = nums[i]
 		}
-		leftIdx = i
-		ret += 1
 	}
 	return ret
 }

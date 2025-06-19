@@ -2,24 +2,28 @@ package main
 
 func canMakePaliQueries(s string, queries [][]int) []bool {
 	dp := make([][26]int, len(s)+1)
-	for i, c := range s {
-		for j := 0; j < 26; j++ {
-			dp[i+1][j] = dp[i][j]
-		}
-		dp[i+1][c-'a']++
+	for i := 1; i < len(dp); i++ {
+		dp[i] = dp[i-1]
+		dp[i][s[i-1]-'a'] += 1
 	}
-	var ret []bool
-	for _, q := range queries {
-		s, e, k := q[0], q[1], q[2]
-		var c int
+	ret := make([]bool, len(queries))
+	for i, q := range queries {
+		a, b := dp[q[1]+1], dp[q[0]]
 		for j := 0; j < 26; j++ {
-			cnt := dp[e+1][j] - dp[s][j]
-			if cnt%2 == 0 {
+			a[j] -= b[j]
+		}
+		var cnt int
+		for _, v := range a {
+			if v%2 == 0 {
 				continue
 			}
-			c++
+			cnt += 1
 		}
-		ret = append(ret, (c)/2 <= k)
+		if (q[1]-q[0]+1)%2 == 1 {
+			cnt -= 1
+		}
+		cnt -= q[2] * 2
+		ret[i] = cnt <= 0
 	}
 	return ret
 }

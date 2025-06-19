@@ -14,6 +14,54 @@ import (
 	"time"
 )
 
+type JobPool struct {
+	jobs chan func()
+	quit chan struct{}
+}
+
+func NewJobPool(worker int) *JobPool {
+	jp := &JobPool{
+		jobs: make(chan func()),
+		quit: make(chan struct{}),
+	}
+	for i := 0; i < worker; i++ {
+		go func() {
+			for {
+				select {
+				case job := <-jp.jobs:
+					job()
+				case <-jp.quit:
+					return
+				}
+			}
+		}()
+	}
+	return jp
+}
+
+// 不阻塞添加任务
+func (p *JobPool) Add(f func()) {
+	select {
+	case <-p.quit:
+		fmt.Println("closed")
+	case p.jobs <- f:
+		fmt.Println("job added")
+	}
+}
+
+// 停止添加任务
+func (p *JobPool) Stop() {
+	close(p.quit)
+}
+
+func main() {
+	start := time.Now()
+	defer func() {
+		log.Printf("takes %v\n", time.Since(start))
+	}()
+	p(countPartitions2([]int{96, 40, 22, 98, 9, 97, 45, 22, 79, 57, 95, 62}, 505))
+}
+
 func readFile(filename string) []string {
 	file, err := os.Open(filename)
 	if err != nil {
@@ -64,19 +112,6 @@ func cmpFile(f1, f2 string) {
 		i++
 		j++
 	}
-}
-
-func main() {
-	// cmpFile("result2.txt", "result3.txt")
-
-	start := time.Now()
-	defer func() {
-		log.Printf("takes %v\n", time.Since(start))
-	}()
-	// p(modifiedGraphEdges(5, toIntInt("[[4,1,-1],[2,0,-1],[0,3,-1],[4,3,-1]]"), 0, 1, 5))
-	// p(modifiedGraphEdges(5, toIntInt("[[1,4,1],[2,4,-1],[3,0,2],[0,4,-1],[1,3,10],[1,0,10]]"), 0, 2, 15))
-	p(deleteAndEarn([]int{3, 4, 2}))
-
 }
 
 func toMap(data map[string]interface{}, obj interface{}, prefix string) {
@@ -137,12 +172,17 @@ func toIntInt(s string) [][]int {
 	json.Unmarshal([]byte(s), &v)
 	return v
 }
+func toStrStr(s string) [][]string {
+	var v [][]string
+	json.Unmarshal([]byte(s), &v)
+	return v
+}
 
 func printMatrix(m [][]int) {
 	fmt.Println()
 	for i := range m {
 		for _, v := range m[i] {
-			fmt.Printf("%3d", v)
+			fmt.Printf("%3d ", v)
 		}
 		fmt.Println()
 	}

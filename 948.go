@@ -1,26 +1,22 @@
 package main
 
-import (
-	"sort"
-)
+import "sort"
 
 func bagOfTokensScore(tokens []int, power int) int {
 	sort.Ints(tokens)
-	l, r := 0, len(tokens)-1
-	var ret, curr int
-	for l <= r {
-		for l <= r && power >= tokens[l] {
-			power -= tokens[l]
-			curr++
-			l++
+	var ret, score int
+	for i, j := 0, len(tokens)-1; i <= j && tokens[i] <= power; {
+		for i <= j && tokens[i] <= power {
+			power -= tokens[i]
+			i++
+			score += 1
 		}
-		ret = max(ret, curr)
-		if l >= r || curr < 1 {
-			break
+		ret = max(ret, score)
+		if score >= 1 {
+			score -= 1
+			power += tokens[j]
+			j--
 		}
-		power += tokens[r]
-		r--
-		curr -= 1
 	}
 	return ret
 }

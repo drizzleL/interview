@@ -4,6 +4,42 @@ import (
 	"sort"
 )
 
+func eventualSafeNodes2(graph [][]int) []int {
+	safe := make([]int, len(graph))
+	for i, node := range graph {
+		if len(node) == 0 {
+			safe[i] = 1
+		}
+	}
+	var helper func(i int) (ret int)
+	helper = func(i int) (ret int) {
+		if safe[i] != 0 {
+			return safe[i]
+		}
+		defer func() {
+			safe[i] = ret
+		}()
+		safe[i] = 2
+		ret = 1
+		for _, next := range graph[i] {
+			if helper(next) == 2 {
+				ret = 2
+				break
+			}
+		}
+		return
+	}
+	for i := range graph {
+		safe[i] = helper(i)
+	}
+	var ret []int
+	for i, v := range safe {
+		if v == 1 {
+			ret = append(ret, i)
+		}
+	}
+	return ret
+}
 func eventualSafeNodes(graph [][]int) []int {
 	seen := make([]bool, len(graph))
 	backDict := map[int][]int{}

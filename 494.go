@@ -5,19 +5,15 @@ func findTargetSumWays(nums []int, target int) int {
 	for _, num := range nums {
 		sum += num
 	}
-	lastdp := make([]int, sum*2+1)
-	lastdp[sum] = 1
-	for _, num := range nums {
-		dp := make([]int, sum*2+1)
-		for i := range lastdp {
-			if i-num >= 0 {
-				dp[i] += lastdp[i-num]
-			}
-			if i+num < len(lastdp) {
-				dp[i] += lastdp[i+num]
-			}
-		}
-		lastdp = dp
+	if sum < target || target < -sum || (target+sum)%2 != 0 {
+		return 0
 	}
-	return lastdp[target+sum]
+	dp := make([]int, (sum+target)/2+1)
+	dp[0] = 1
+	for _, num := range nums {
+		for j := len(dp) - 1; j >= num; j-- {
+			dp[j] += dp[j-num]
+		}
+	}
+	return dp[len(dp)-1]
 }

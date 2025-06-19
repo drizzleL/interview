@@ -1,19 +1,27 @@
 package main
 
 func deleteDuplicates(head *ListNode) *ListNode {
-	pre := &ListNode{
-		Next: head,
+	if head == nil {
+		return nil
 	}
-	node := pre
-	for node != nil && node.Next != nil {
-		val := node.Next.Val
-		if node.Next.Next == nil || node.Next.Next.Val != val { // next exists dup
-			node = node.Next
+	preHead := &ListNode{Next: head, Val: head.Val - 1}
+	for pre := preHead; pre != nil; {
+		if pre.Next == nil {
+			break
+		}
+		next := pre.Next
+		if next.Next == nil {
+			break
+		}
+		if next.Next.Val != next.Val {
+			pre = pre.Next
 			continue
 		}
-		for node.Next != nil && node.Next.Val == val {
-			node.Next = node.Next.Next
+		val := next.Val
+		for next != nil && next.Val == val {
+			next = next.Next
 		}
+		pre.Next = next
 	}
-	return pre.Next
+	return preHead.Next
 }

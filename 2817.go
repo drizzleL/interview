@@ -2,37 +2,21 @@ package main
 
 import (
 	"math"
-	"sort"
+
+	"github.com/emirpasic/gods/trees/redblacktree"
 )
 
 func minAbsoluteDifference(nums []int, x int) int {
-	if len(nums) == 0 {
-		return 0
-	}
-	sortedNums := []int{nums[0]}
+	rt := redblacktree.NewWithIntComparator()
+	rt.Put(math.MaxInt32, nil)
+	rt.Put(math.MinInt32, nil)
 	ret := math.MaxInt32
 	for i := x; i < len(nums); i++ {
-		nearest := sort.SearchInts(sortedNums, nums[i])
-		if nearest < len(sortedNums) {
-			ret = min(ret, sortedNums[nearest]-nums[i])
-		} else {
-			ret = min(ret, nums[i]-sortedNums[len(sortedNums)-1])
-		}
-		if nearest != 0 {
-			ret = min(ret, nums[i]-sortedNums[nearest-1])
-		}
-		j := i - x + 1
-		idx := sort.SearchInts(sortedNums, nums[j])
-		if idx < len(sortedNums) && sortedNums[idx] == nums[j] { // existed, skip
-			continue
-		}
-		if idx == len(sortedNums) {
-			sortedNums = append(sortedNums, nums[j])
-			continue
-		}
-		sortedNums = append(sortedNums, 0)
-		copy(sortedNums[idx+1:], sortedNums[idx:])
-		sortedNums[idx] = nums[j]
+		rt.Put(nums[i-x], nil)
+		a, _ := rt.Ceiling(nums[i-x]) // find larger
+		b, _ := rt.Floor(nums[i-x])   // find smaller
+		ret = min(ret, a.Key.(int)-nums[i])
+		ret = min(ret, nums[i]-b.Key.(int))
 	}
 	return ret
 }

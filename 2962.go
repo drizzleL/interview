@@ -6,19 +6,22 @@ func countSubarrays2(nums []int, k int) int64 {
 		maxVal = max(maxVal, num)
 	}
 	var cnt int
-	var l int
 	var ret int
-	for r, num := range nums {
-		if num == maxVal {
-			cnt += 1
-		}
-		for cnt == k {
-			ret += len(nums) - r
-			if nums[l] == maxVal {
-				cnt -= 1
+	for i, j := 0, 0; i < len(nums); i++ {
+		for j < len(nums) && cnt < k {
+			if nums[j] == maxVal {
+				cnt += 1
 			}
-			l++
+			j++
+		}
+		if cnt < k {
+			break
+		}
+		ret += len(nums) - j + 1
+		if nums[i] == maxVal {
+			cnt -= 1
 		}
 	}
 	return int64(ret)
+
 }

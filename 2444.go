@@ -1,24 +1,46 @@
 package main
 
 func countSubarrays(nums []int, minK int, maxK int) int64 {
-	minIdx, maxIdx := -1, -1
-	leftIdx := 0
-	var ret int
-	for i, num := range nums {
-		if num > maxK || num < minK {
-			minIdx, maxIdx = -1, -1
-			leftIdx = i + 1
+	if len(nums) == 0 {
+		return 0
+	}
+	currMin, currMax := nums[0], nums[0]
+	var rightMost int
+	for ; rightMost < len(nums); rightMost++ {
+		if nums[rightMost] > maxK || nums[rightMost] < minK {
+			break
+		}
+		currMax = max(currMax, nums[rightMost])
+		currMin = min(currMin, nums[rightMost])
+	}
+	var ret int64
+	if rightMost != len(nums) { // found weird num
+		ret = countSubarrays(nums[rightMost+1:], minK, maxK)
+	}
+	if currMin != minK || currMax != maxK {
+		return ret
+	}
+	leftMost := 0
+	lastMin, lastMax := -1, -1
+	for i := 0; i < rightMost; i++ {
+		if nums[i] == minK {
+			lastMin = i
+		}
+		if nums[i] == maxK {
+			lastMax = i
+		}
+		if lastMin == -1 || lastMax == -1 {
 			continue
 		}
-		if num == maxK {
-			maxIdx = i
+		ret += int64((min(lastMin, lastMax) - leftMost + 1) * (rightMost - max(lastMin, lastMax)))
+		leftMost = min(lastMin, lastMax) + 1
+		lastMin, lastMax = -1, -1 // reset again
+		if nums[i] == minK {
+			lastMin = i
 		}
-		if num == minK {
-			minIdx = i
-		}
-		if minIdx != -1 && maxIdx != -1 {
-			ret += min(minIdx, maxIdx) - leftIdx + 1
+		if nums[i] == maxK {
+			lastMax = i
 		}
 	}
-	return int64(ret)
+	return ret
 }

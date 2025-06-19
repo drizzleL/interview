@@ -1,79 +1,41 @@
 package main
 
+import "container/heap"
+
 func networkDelayTime(times [][]int, n int, k int) int {
-	sig := make([]int, n+1)
-	for i := range sig {
-		sig[i] = -1
+	dict := make([][][2]int, n)
+	for _, t := range times {
+		dict[t[0]-1] = append(dict[t[0]-1], [2]int{t[1] - 1, t[2]})
 	}
-
-	dict := map[int][]int{}
-	for i, item := range times {
-		dict[item[0]] = append(dict[item[0]], i)
+	seen := make([]int, n)
+	for i := range seen {
+		seen[i] = -1
 	}
-
-	var q PriorityQueue
-	q = append(q, &Item{
-		cost: 0,
-		idx:  k,
-	})
-	for len(q) != 0 {
-		item := q.Pop().(*Item)
-		sig[item.idx] = item.cost
-		for _, nextIdx := range dict[item.idx] {
-			next := times[nextIdx]
-			newCost := item.cost + next[2]
-			if sig[next[1]] != -1 {
+	h := &HeapArr{
+		LessHelper: func(a, b interface{}) bool {
+			return a.([2]int)[1] < b.([2]int)[1]
+		},
+	}
+	heap.Push(h, [2]int{k - 1, 0})
+	for h.Len() > 0 {
+		top := heap.Pop(h).([2]int)
+		if seen[top[0]] != -1 {
+			continue
+		}
+		seen[top[0]] = top[1]
+		for _, next := range dict[top[0]] {
+			if seen[next[0]] != -1 && seen[next[0]] < top[1]+next[1] {
 				continue
 			}
-			q.Push(&Item{
-				cost: newCost,
-				idx:  next[1],
-			})
+			heap.Push(h, [2]int{next[0], top[1] + next[1]})
 		}
 	}
-
 	var ret int
-	for i := 1; i < len(sig); i++ {
-		v := sig[i]
+	for _, v := range seen {
 		if v == -1 {
 			return -1
 		}
 		ret = max(ret, v)
 	}
 	return ret
-}
-
-type Item struct {
-	idx  int
-	cost int
-}
-
-// A PriorityQueue implements heap.Interface and holds Items.
-type PriorityQueue []*Item
-
-func (pq PriorityQueue) Len() int { return len(pq) }
-
-func (pq PriorityQueue) Less(i, j int) bool {
-	if pq[i].cost == pq[j].cost {
-		return pq[i].idx < pq[j].idx
-	}
-	return pq[i].cost < pq[j].cost
-}
-
-func (pq PriorityQueue) Swap(i, j int) {
-	pq[i], pq[j] = pq[j], pq[i]
-}
-
-func (pq *PriorityQueue) Push(x any) {
-	item := x.(*Item)
-	*pq = append(*pq, item)
-}
-
-func (pq *PriorityQueue) Pop() any {
-	old := *pq
-	n := len(old)
-	item := old[n-1]
-	old[n-1] = nil // avoid memory leak
-	*pq = old[0 : n-1]
-	return item
 }

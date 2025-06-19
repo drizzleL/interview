@@ -1,44 +1,48 @@
 package main
 
 func checkIfPrerequisite(numCourses int, prerequisites [][]int, queries [][]int) []bool {
-	dict := map[int][]int{}
-	in := make([]int, numCourses)
-	for _, p := range prerequisites {
-		u, v := p[0], p[1]
-		in[v] += 1
-		dict[u] = append(dict[u], v)
+	prers := make([][]int, numCourses)
+	for _, prer := range prerequisites {
+		prers[prer[0]] = append(prers[prer[0]], prer[1])
 	}
-	parents := map[int]map[int]bool{}
-	for i := 0; i < numCourses; i++ {
-		parents[i] = map[int]bool{
-			i: true,
+	children := make([][]bool, numCourses)
+	for i := range children {
+		children[i] = make([]bool, numCourses)
+	}
+	cache := make([]bool, numCourses)
+	ans := make([][]int, numCourses)
+	var getChildren func(i int) []int
+	getChildren = func(i int) (ret []int) {
+		if cache[i] {
+			return ans[i]
 		}
-	}
-	var nodes []int
-	for i, v := range in {
-		if v == 0 {
-			nodes = append(nodes, i)
-		}
-	}
-	for len(nodes) != 0 {
-		var next []int
-		for _, n := range nodes {
-			for _, child := range dict[n] {
-				for p := range parents[n] {
-					parents[child][p] = true
-				}
-				in[child] -= 1
-				if in[child] == 0 {
-					next = append(next, child)
-				}
+		defer func() {
+			cache[i] = true
+			ans[i] = ret
+		}()
+		seen := make([]bool, numCourses)
+		for _, directChild := range prers[i] {
+			seen[directChild] = true
+			for _, c := range getChildren(directChild) {
+				seen[c] = true
 			}
 		}
-		nodes = next
+		for child, ok := range seen {
+			if ok {
+				seen[child] = true
+				ret = append(ret, child)
+			}
+		}
+		return
+	}
+	for i := 0; i < numCourses; i++ {
+		for _, child := range getChildren(i) {
+			children[i][child] = true
+		}
 	}
 	ret := make([]bool, len(queries))
 	for i, q := range queries {
-		u, v := q[0], q[1]
-		ret[i] = parents[v][u]
+		ret[i] = children[q[0]][q[1]]
 	}
 	return ret
 }

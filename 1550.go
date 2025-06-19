@@ -1,14 +1,13 @@
 package main
 
 func threeConsecutiveOdds(arr []int) bool {
-	var odds int
-	for _, num := range arr {
-		if num%2 == 0 {
-			odds = 0
+	for i, cnt := 0, 0; i < len(arr); i++ {
+		if arr[i]%2 == 0 {
+			cnt = 0
 			continue
 		}
-		odds += 1
-		if odds >= 3 {
+		cnt += 1
+		if cnt == 3 {
 			return true
 		}
 	}

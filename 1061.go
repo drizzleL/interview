@@ -5,29 +5,26 @@ func smallestEquivalentString(s1 string, s2 string, baseStr string) string {
 	for i := range parent {
 		parent[i] = i
 	}
-	var find func(a int) int
-	find = func(a int) int {
-		if parent[a] != a {
-			parent[a] = find(parent[a])
+	var find func(x int) int
+	find = func(x int) int {
+		if parent[x] != x {
+			parent[x] = find(parent[x])
 		}
-		return parent[a]
+		return parent[x]
 	}
 	union := func(a, b int) {
-		if a == b {
-			return
+		pa, pb := find(a), find(b)
+		if pa > pb {
+			pa, pb = pb, pa
 		}
-		if find(a) > find(b) {
-			a, b = b, a
-		}
-		parent[find(b)] = find(a)
+		parent[pb] = pa
 	}
 	for i := range s1 {
-		c1, c2 := s1[i], s2[i]
-		union(int(c1-'a'), int(c2-'a'))
+		union(int(s1[i]-'a'), int(s2[i]-'a'))
 	}
-	ret := make([]byte, 0, len(baseStr))
-	for _, c := range baseStr {
-		ret = append(ret, byte('a'+find(int(c-'a'))))
+	b := []byte(baseStr)
+	for i := range b {
+		b[i] = byte('a' + find(int(b[i]-'a')))
 	}
-	return string(ret)
+	return string(b)
 }

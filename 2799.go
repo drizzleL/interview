@@ -1,27 +1,32 @@
 package main
 
+import "log"
+
 func countCompleteSubarrays(nums []int) int {
 	dict := map[int]int{}
 	for _, num := range nums {
 		dict[num] += 1
 	}
-	var hasNum int
-	curr := map[int]int{}
+	cnt := len(dict)
+	dict = map[int]int{}
 	var ret int
-	for l, r := 0, 0; l < len(nums); l++ {
-		for ; r < len(nums) && hasNum < len(dict); r++ {
-			curr[nums[r]] += 1
-			if curr[nums[r]] == 1 {
-				hasNum += 1
+	var curr int
+	for i, j := 0, 0; i < len(nums); i++ {
+		for ; j < len(nums) && curr != cnt; j++ {
+			if dict[nums[j]] == 0 {
+				curr += 1
 			}
+			dict[nums[j]] += 1
 		}
-		if hasNum == len(dict) {
-			ret += len(nums) - r + 1
+		if curr != cnt {
+			break
 		}
-		curr[nums[l]] -= 1
-		if curr[nums[l]] == 0 {
-			hasNum -= 1
+		log.Println(j)
+		ret += len(nums) - j + 1
+		if dict[nums[i]] == 1 {
+			curr -= 1
 		}
+		dict[nums[i]] -= 1
 	}
 	return ret
 }

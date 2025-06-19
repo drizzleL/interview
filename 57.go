@@ -1,28 +1,40 @@
 package main
 
-import (
-	"sort"
-)
+import "sort"
 
 func insert(intervals [][]int, newInterval []int) [][]int {
-	if len(intervals) == 0 {
-		return [][]int{newInterval}
-	}
-	start := sort.Search(len(intervals), func(i int) bool {
-		return intervals[i][1] >= newInterval[0]
+	sort.Slice(intervals, func(i, j int) bool {
+		return intervals[i][0] < intervals[j][0]
 	})
-	end := sort.Search(len(intervals), func(i int) bool {
-		return intervals[i][0] > newInterval[1]
-	})
-	if start != len(intervals) {
-		newInterval[0] = min(newInterval[0], intervals[start][0])
+	if len(intervals) == 0 || newInterval[0] > intervals[len(intervals)-1][1] {
+		return append(intervals, newInterval)
 	}
-	if end != 0 {
-		newInterval[1] = max(newInterval[1], intervals[end-1][1])
+	if newInterval[1] < intervals[0][0] {
+		return append([][]int{newInterval}, intervals...)
 	}
-	ret := make([][]int, start)
-	copy(ret, intervals[:start])
-	ret = append(ret, newInterval)
-	ret = append(ret, intervals[end:]...)
+	var ret [][]int
+	for len(intervals) != 0 {
+		intv := intervals[0]
+		intervals = intervals[1:]
+		if intv[1] < newInterval[0] {
+			ret = append(ret, intv)
+			continue
+		}
+		if newInterval[1] < intv[0] {
+			ret = append(ret, newInterval, intv)
+			ret = append(ret, intervals...)
+			return ret
+		}
+		ret = append(ret, []int{min(intv[0], newInterval[0]), max(intv[1], newInterval[1])})
+		break
+	}
+	for len(intervals) != 0 {
+		intv := intervals[0]
+		if intv[0] > ret[len(ret)-1][1] {
+			return append(ret, intervals...)
+		}
+		ret[len(ret)-1][1] = max(ret[len(ret)-1][1], intv[1])
+		intervals = intervals[1:]
+	}
 	return ret
 }

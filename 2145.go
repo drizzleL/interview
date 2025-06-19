@@ -1,15 +1,16 @@
 package main
 
 func numberOfArrays(differences []int, lower int, upper int) int {
-	var minVal, maxVal, val int
+	var v, minVal, maxVal int
 	for _, diff := range differences {
-		val += diff
-		minVal = min(minVal, val)
-		maxVal = max(maxVal, val)
+		v += diff
+		minVal = min(minVal, v)
+		maxVal = max(maxVal, v)
 	}
 	gap := maxVal - minVal
-	if gap > upper-lower {
+	gap2 := upper - lower
+	if gap > gap2 {
 		return 0
 	}
-	return upper - lower - gap + 1
+	return gap2 - gap
 }

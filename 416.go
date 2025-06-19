@@ -8,13 +8,13 @@ func canPartition(nums []int) bool {
 	if sum%2 != 0 {
 		return false
 	}
-	target := sum / 2
-	dp := make([]bool, target+1)
+	sum /= 2
+	dp := make([]bool, sum+1)
 	dp[0] = true
 	for _, num := range nums {
-		for i := target; i >= num; i-- {
-			dp[i] = dp[i] || dp[i-num]
+		for j := len(dp) - 1; j >= num; j-- {
+			dp[j] = dp[j] || dp[j-num]
 		}
 	}
-	return dp[target]
+	return dp[sum]
 }

@@ -1,7 +1,5 @@
 package main
 
-import "math"
-
 func cuttingBamboo(bamboo_len int) int {
 	if bamboo_len <= 3 {
 		return bamboo_len - 1
@@ -18,5 +16,19 @@ func cuttingBamboo(bamboo_len int) int {
 	case 0:
 		n3 = bamboo_len / 3
 	}
-	return ret * int(math.Pow(3, float64(n3))) % 1e7
+	return ret * int(pow(3, int64(n3)))
+}
+
+func pow(a, b int64) int64 {
+	ret := int64(1)
+	base := a
+	for b != 0 {
+		if b&1 != 0 {
+			ret *= base
+			ret %= 1e9 + 7
+		}
+		base *= base
+		base %= 1e9 + 7
+	}
+	return ret
 }
