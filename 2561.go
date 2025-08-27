@@ -21,7 +21,7 @@ func minCost8(basket1 []int, basket2 []int) int64 {
 		if dict[k]%2 != 0 {
 			return -1
 		}
-		for i := 0; i < abs(dict[k]); i++ {
+		for i := 0; i < abs(dict[k])/2; i++ {
 			swaps = append(swaps, k)
 		}
 	}

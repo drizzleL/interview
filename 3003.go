@@ -1,81 +1,85 @@
 package main
 
 import (
+	"log"
 	"sort"
 )
 
-// TODO
 func maxPartitionsAfterOperations(s string, k int) int {
 	if k == 26 {
 		return 1
 	}
+	var seen [26]bool
 	var cnt int
-	var flag int
-	dp := make([]int, len(s)+1)
-	dp[len(s)] = 1
+	var idxs [26][]int
+	suffix := make([]int, len(s)+1)
 	for i := len(s) - 1; i >= 0; i-- {
-		dp[i] = dp[i+1]
-		c := s[i] - 'a'
-		if cnt == k && flag&(1<<c) == 0 {
+		suffix[i] = suffix[i+1]
+		c := int(s[i] - 'a')
+		idxs[c] = append(idxs[c], i)
+		if seen[c] {
+			continue
+		}
+		log.Println(i, c, cnt)
+		if cnt%k == 0 {
+			suffix[i] += 1
+			seen = [26]bool{}
 			cnt = 0
-			flag = 0
-			dp[i] += 1
 		}
-		if flag&(1<<c) == 0 {
-			cnt += 1
-		}
-		flag |= 1 << c
+		cnt += 1
+		seen[c] = true
 	}
-	idxDict := [26][]int{}
-	for i := 0; i < len(s); i++ {
-		c := s[i] - 'a'
-		idxDict[c] = append(idxDict[c], i)
+	for i := range idxs {
+		sort.Ints(idxs[i])
 	}
-	flag = 0
+	var precnt int
 	cnt = 0
-	var ret int
-	var preCnt int
-	var findEnd func(i int, cnt int, flag int) int
-	findEnd = func(i int, cnt int, flag int) int {
-		var extra int
-		if cnt == k {
-			extra = 1
-			cnt = 0
-		}
-		var arr []int
-		candidates := flag
-		for i := range idxDict {
-			if len(idxDict[i]) == 0 {
-				continue
-			}
-			if cnt != 0 && flag&(1<<i) != 0 {
-				continue
-			}
-			candidates |= 1 << i
-			arr = append(arr, idxDict[i][0])
-		}
-		if candidates == 1<<26-1 {
-			return 1 + extra + dp[arr[k-cnt]]
-		}
-		sort.Ints(arr)
-		if len(arr) <= k-cnt-1 {
-			return 1 + extra
-		}
-		return dp[arr[k-cnt-1]] + 1 + extra
-	}
+	ret := suffix[0]
+	seen = [26]bool{}
 	for i := 0; i < len(s); i++ {
-		c := s[i] - 'a'
-		idxDict[c] = idxDict[c][1:]
-		if cnt == k && flag&(1<<c) == 0 { // reset
+		c := int(s[i] - 'a')
+		idxs[c] = idxs[c][1:]
+		for j := 0; j < 26; j++ {
+			if j == c || seen[j] {
+				continue
+			}
+			tmp := precnt
+			var nextIdxs []int
+			var nextIdx int
+			if cnt == k { // start new session
+				tmp += 1
+				nextIdx = k - 1
+				for j2 := 0; j2 < 26; j2++ {
+					if j2 == j || len(idxs[j2]) == 0 {
+						continue
+					}
+					nextIdxs = append(nextIdxs, idxs[j2][0])
+				}
+			} else {
+				nextIdx = k - cnt - 1
+				for j2 := 0; j2 < 26; j2++ {
+					if j2 == j || seen[j2] || len(idxs[j2]) == 0 {
+						continue
+					}
+					nextIdxs = append(nextIdxs, idxs[j2][0])
+				}
+			}
+			if nextIdx < len(nextIdxs) {
+				sort.Ints(nextIdxs)
+				tmp += suffix[nextIdxs[nextIdx]]
+			}
+			ret = max(ret, 1+tmp)
+		}
+		if seen[c] {
+			continue
+		}
+		if i != 0 && cnt%k == 0 {
+			precnt += 1
+			seen = [26]bool{}
 			cnt = 0
-			flag = 0
-			preCnt += 1
 		}
-		ret = max(ret, preCnt+findEnd(i, cnt, flag))
-		if flag&(1<<c) == 0 {
-			cnt += 1
-		}
-		flag |= 1 << c
+		cnt += 1
+		seen[c] = true
 	}
 	return ret
 }

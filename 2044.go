@@ -1,28 +1,22 @@
 package main
 
-import "math"
-
 func countMaxOrSubsets(nums []int) int {
 	var or int
 	for _, num := range nums {
 		or |= num
 	}
 	var ret int
-	var helper func(i int, flag int)
-	helper = func(i int, flag int) {
-		if i == len(nums) {
-			if flag == or {
-				ret += 1
+	for mask := 1; mask < 1<<len(nums); mask++ {
+		var or2 int
+		for i := 0; i < len(nums); i++ {
+			if mask&(1<<i) == 0 {
+				continue
 			}
-			return
+			or2 |= nums[i]
 		}
-		if flag == or {
-			ret += int(math.Pow(2, float64(len(nums)-i)))
-			return
+		if or2 == or {
+			ret += 1
 		}
-		helper(i+1, flag|nums[i])
-		helper(i+1, flag)
 	}
-	helper(0, 0)
 	return ret
 }

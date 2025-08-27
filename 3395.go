@@ -84,6 +84,20 @@ func combination(a, b int) int {
 	return ret
 }
 
+func pow(x, k int, mod int) int {
+	ret := 1
+	for k != 0 {
+		if k&1 != 0 {
+			ret *= x
+			ret %= mod
+		}
+		k >>= 1
+		x *= x
+		x %= mod
+	}
+	return ret
+}
+
 func fastPow(x, k int, base int) int {
 	for k != 0 {
 		if k&1 != 0 {

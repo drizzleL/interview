@@ -1,28 +1,40 @@
 package main
 
 func maxDistance3(s string, k int) int {
+	var extra int
+	var s1, s2 int
+	helper := func(s1, s2 int, extra int) int {
+		ret := abs(s1) + abs(s2)
+		change := min(k, extra)
+		ret += change * 2
+		ret += k
+		return ret
+	}
 	var ret int
-	for _, dir := range []string{"NE", "NW", "SE", "SW"} {
-		kk := k
-		var dist int
-		for _, c := range s {
-			var flag bool
-			for _, c2 := range dir {
-				if c == c2 {
-					flag = true
-					break
-				}
+	for _, c := range s {
+		switch c {
+		case 'N':
+			if s1 < 0 {
+				extra += 1
 			}
-			if flag {
-				dist += 1
-			} else if kk != 0 {
-				dist += 1
-				kk -= 1
-			} else {
-				dist -= 1
+			s1 += 1
+		case 'S':
+			if s1 > 0 {
+				extra += 1
 			}
-			ret = max(ret, dist)
+			s1 -= 1
+		case 'E':
+			if s2 < 0 {
+				extra += 1
+			}
+			s2 += 1
+		case 'W':
+			if s2 > 0 {
+				extra += 1
+			}
+			s2 -= 1
 		}
+		ret = max(ret, helper(s1, s2, extra))
 	}
 	return ret
 }

@@ -1,21 +1,24 @@
 package main
 
 func maxFreeTime(eventTime int, k int, startTime []int, endTime []int) int {
-	gaps := make([]int, len(startTime)+1)
-	gaps[0] = startTime[0]
-	gaps[len(gaps)-1] = eventTime - endTime[len(endTime)-1]
-	for i := 1; i < len(gaps)-1; i++ {
-		gaps[i] = startTime[i] - endTime[i-1]
-	}
-	presum := make([]int, len(gaps)+1)
-	for i := 1; i < len(presum); i++ {
-		presum[i] = presum[i-1] + gaps[i-1]
-	}
-	var ret int
-	for i := 0; i < len(presum); i++ {
-		end := min(i+k, len(gaps)-1)
-		tmp := presum[end+1] - presum[i]
-		ret = max(ret, tmp)
+	var presum, ret int
+	for i := 0; i <= len(startTime); i++ {
+		switch i {
+		case 0:
+			presum += startTime[0]
+		case len(startTime):
+			presum += eventTime - endTime[len(endTime)-1]
+		default:
+			presum += startTime[i] - endTime[i-1]
+		}
+		if i > k { // gotta remove before
+			if i-k == 1 {
+				presum -= startTime[0]
+			} else {
+				presum -= startTime[i-k-1] - endTime[i-k-2]
+			}
+		}
+		ret = max(ret, presum)
 	}
 	return ret
 }

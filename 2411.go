@@ -4,6 +4,45 @@ import (
 	"math/bits"
 )
 
+func smallestSubarrays2(nums []int) []int {
+	var maxVal int
+	for _, num := range nums {
+		maxVal = max(maxVal, num)
+	}
+	bitSize := bits.Len(uint(maxVal))
+	dict := make([]int, bitSize)
+	ret := make([]int, len(nums))
+	check := func(num int) bool {
+		for k := 0; k < bitSize; k++ {
+			if num&(1<<k) == 0 {
+				continue
+			}
+			if dict[k] == 1 {
+				return false
+			}
+		}
+		return true
+	}
+	for i, j := len(nums)-1, len(nums)-1; i >= 0; i-- {
+		v := nums[i]
+		for k := 0; k < bitSize; k++ {
+			if v&(1<<k) == 0 {
+				continue
+			}
+			dict[k] += 1
+		}
+		for check(nums[j]) {
+			for k := 0; k < bitSize; k++ {
+				if nums[j]&(1<<k) != 0 {
+					dict[k] -= 1
+				}
+			}
+			j -= 1
+		}
+		ret[i] = j - i + 1
+	}
+	return ret
+}
 func smallestSubarrays(nums []int) []int {
 	var maxVal int
 	for _, num := range nums {

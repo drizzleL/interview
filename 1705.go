@@ -48,7 +48,8 @@ type HeapArr struct {
 
 type Array []interface{}
 
-func (h Array) Len() int { return len(h) }
+func (h Array) Top() interface{} { return h[0] }
+func (h Array) Len() int         { return len(h) }
 func (h HeapArr) Less(i, j int) bool {
 	return h.LessHelper(h.Array[i], h.Array[j])
 }

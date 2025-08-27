@@ -59,7 +59,6 @@ func main() {
 	defer func() {
 		log.Printf("takes %v\n", time.Since(start))
 	}()
-	p(countPartitions2([]int{96, 40, 22, 98, 9, 97, 45, 22, 79, 57, 95, 62}, 505))
 }
 
 func readFile(filename string) []string {

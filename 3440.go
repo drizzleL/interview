@@ -1,5 +1,40 @@
 package main
 
+func maxFreeTime3(eventTime int, startTime []int, endTime []int) int {
+	var beforeGap, afterGap int
+	var ret int
+	for i := 0; i < len(startTime); i++ {
+		before := 0
+		if i != 0 {
+			before = endTime[i-1]
+		}
+		after := eventTime
+		if i != len(startTime)-1 {
+			after = startTime[i+1]
+		}
+		if endTime[i]-startTime[i] <= beforeGap {
+			ret = max(ret, after-before)
+		} else {
+			ret = max(ret, after-before-(endTime[i]-startTime[i]))
+		}
+		beforeGap = max(beforeGap, startTime[i]-before)
+	}
+	for i := len(startTime) - 1; i >= 0; i-- {
+		before := 0
+		if i != 0 {
+			before = endTime[i-1]
+		}
+		after := eventTime
+		if i != len(startTime)-1 {
+			after = startTime[i+1]
+		}
+		if endTime[i]-startTime[i] <= afterGap {
+			ret = max(ret, after-before)
+		}
+		afterGap = max(afterGap, after-endTime[i])
+	}
+	return ret
+}
 func maxFreeTime2(eventTime int, startTime []int, endTime []int) int {
 	beforeMax := make([]int, len(startTime))
 	for i, before := 1, startTime[0]; i < len(startTime); i++ {

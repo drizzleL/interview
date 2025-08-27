@@ -1,29 +1,48 @@
 package main
 
-func minOperations13(queries [][]int) int64 {
-	getPresum := func(x int) int {
-		if x == 0 {
+func lenOfVDiagonal(grid [][]int) int {
+	m, n := len(grid), len(grid[0])
+	dp := make([][][][]int, m)
+	for i := range dp {
+		dp[i] = make([][][]int, n)
+		for j := range dp[i] {
+			dp[i][j] = make([][]int, 4)
+			for k := range dp[i][j] {
+				dp[i][j][k] = make([]int, 2)
+				dp[i][j][k][0] = -1
+				dp[i][j][k][1] = -1
+			}
+		}
+	}
+	dirs := [][2]int{{0, 1}, {1, 1}, {1, 0}, {1, -1}}
+	var dfs func(i, j int, dir int, target int, turn int) int
+	dfs = func(i, j int, dir int, target int, turn int) int {
+		nextI, nextJ := i+dirs[dir][0], j+dirs[dir][1]
+		if nextI < 0 || nextI >= m || nextJ < 0 || nextJ >= n {
 			return 0
 		}
-		l, r := 1, 3
-		var ret int
-		for k := 1; l <= x; k++ {
-			ret += (min(x, r) - l + 1) * k
-			l, r = r+1, (r+1)*4-1
+		if grid[nextI][nextJ] != target {
+			return 0
 		}
+		if dp[nextI][nextJ][dir][turn] != -1 {
+			return dp[nextI][nextJ][dir][turn]
+		}
+		ret := dfs(nextI, nextJ, dir, target, turn)
+		if turn == 0 {
+			ret = max(ret, dfs(nextI, nextJ, (dir+1)%4, target, 1)+1)
+		}
+		dp[nextI][nextJ][dir][turn] = ret
 		return ret
 	}
-	getSum := func(l, r int) int {
-		return getPresum(r) - getPresum(l-1)
-	}
-	var ret int
-	for _, q := range queries {
-		l, r := q[0], q[1]
-		sum := getSum(l, r)
-		ret += sum / 2
-		if sum/2*2 != sum {
-			ret += 1
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			if grid[i][j] == 1 {
+				continue
+			}
+			for dir := 0; dir < 4; dir++ {
+				dfs(i, j, dir, 2, 0)
+			}
 		}
 	}
-	return int64(ret)
+	return 0
 }
