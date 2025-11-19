@@ -6,7 +6,7 @@ func goodTriplets(nums1 []int, nums2 []int) int64 {
 		idxs[v] = i
 	}
 	pre, suff := make([]int, len(nums1)), make([]int, len(nums1))
-	preIdxs, suffIdxs := NewBiTree(len(nums1)), NewBiTree(len(nums1))
+	preIdxs, suffIdxs := NewBiTree(len(nums2)), NewBiTree(len(nums1))
 	for i := 0; i < len(nums1); i++ {
 		num := nums1[i]
 		pre[i] = preIdxs.Query(idxs[num])

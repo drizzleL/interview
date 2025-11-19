@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>股票交易系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📈 股票交易系统</h1>
+            <div class="user-info">
+                <span>用户: <strong id="currentUser">default_user</strong></span>
+                <button onclick="changeUser()">切换用户</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- 股票列表 -->
+            <section class="stocks-section">
+                <h2>📊 市场行情</h2>
+                <div class="stocks-grid" id="stocksGrid">
+                    <!-- 股票卡片将通过JavaScript动态生成 -->
+                </div>
+            </section>
+
+            <!-- 交易操作 -->
+            <section class="trading-section">
+                <h2>💼 交易操作</h2>
+                <div class="trading-form">
+                    <div class="form-group">
+                        <label for="orderSymbol">股票代码:</label>
+                        <select id="orderSymbol" required>
+                            <option value="">选择股票</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="orderType">交易类型:</label>
+                        <select id="orderType" required>
+                            <option value="BUY">买入</option>
+                            <option value="SELL">卖出</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="orderQuantity">数量:</label>
+                        <input type="number" id="orderQuantity" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="orderPrice">价格:</label>
+                        <input type="number" id="orderPrice" step="0.01" min="0" required>
+                    </div>
+                    <button onclick="placeOrder()" class="btn-primary">下单</button>
+                </div>
+            </section>
+
+            <!-- 挂单列表 -->
+            <section class="orders-section">
+                <h2>📋 当前挂单</h2>
+                <div class="orders-table" id="openOrdersTable">
+                    <!-- 挂单列表将通过JavaScript动态生成 -->
+                </div>
+            </section>
+
+            <!-- 投资组合 -->
+            <section class="portfolio-section">
+                <h2>💰 投资组合</h2>
+                <div class="portfolio-info" id="portfolioInfo">
+                    <!-- 投资组合信息将通过JavaScript动态生成 -->
+                </div>
+            </section>
+
+            <!-- 交易历史 -->
+            <section class="trades-section">
+                <h2>📜 交易历史</h2>
+                <div class="trades-table" id="tradesTable">
+                    <!-- 交易历史将通过JavaScript动态生成 -->
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- 消息提示 -->
+    <div id="message" class="message hidden"></div>
+
+    <script src="/static/js/app.js?v=1.1"></script>
+</body>
+
+</html>

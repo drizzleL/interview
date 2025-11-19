@@ -19,12 +19,8 @@ func subarrayGCD(nums []int, k int) int {
 }
 
 func gcd(a, b int) int {
-	if a < b {
-		a, b = b, a
+	for b != 0 {
+		a, b = b, a%b
 	}
-	tmp := a % b
-	if tmp == 0 {
-		return b
-	}
-	return gcd(tmp, b)
+	return a
 }

@@ -2,21 +2,43 @@ package main
 
 import (
 	"strconv"
-	"strings"
 )
 
 func nextBeautifulNumber(n int) int {
 	base := []int{1, 22, 122, 333, 1333, 4444, 14444, 22333, 55555, 122333, 155555, 224444, 666666}
-	ret := 1224444
-	ns := strconv.Itoa(n)
 	reverse := func(b []byte) {
 		for i, j := 0, len(b)-1; i < j; i, j = i+1, j-1 {
 			b[i], b[j] = b[j], b[i]
 		}
 	}
-	nextPerm := func(x string) string {
-		b := []byte(x)
-		for i := len(x) - 2; i >= 0; i-- {
+	var bb [][]byte
+	for _, v := range base {
+		b := []byte(strconv.Itoa(v))
+		reverse(b)
+		bb = append(bb, b)
+	}
+	cmp := func(a, b []byte) int {
+		if len(a) > len(b) {
+			return 1
+		}
+		if len(a) < len(b) {
+			return -1
+		}
+		for i := 0; i < len(a); i++ {
+			if a[i] > b[i] {
+				return 1
+			}
+			if a[i] < b[i] {
+				return -1
+			}
+		}
+		return 0
+
+	}
+	ret := 1224444
+	ns := []byte(strconv.Itoa(n))
+	nextPerm := func(b []byte) []byte {
+		for i := len(b) - 2; i >= 0; i-- {
 			if b[i] >= b[i+1] {
 				continue
 			}
@@ -24,31 +46,29 @@ func nextBeautifulNumber(n int) int {
 			for m := i + 1; m < len(b); m++ {
 				if b[m] > b[i] {
 					b[m], b[i] = b[i], b[m]
-					return string(b)
+					return b
 				}
 			}
 		}
-		return string(b)
+		return b
 	}
-	for _, v := range base {
-		s := strconv.Itoa(v)
-		if len(s) < len(ns) {
+
+	for _, v := range bb {
+		if len(v) > len(ns)+1 {
+			break
+		}
+		if cmp(v, ns) <= 0 {
 			continue
 		}
-		if len(s) > len(ns) {
-			ret = min(ret, v)
-			continue
-		}
+		reverse(v)
 		for {
-			if strings.Compare(s, ns) > 0 {
-				v2, _ := strconv.Atoi(s)
-				ret = min(ret, v2)
+			v = nextPerm(v)
+			if cmp(v, ns) <= 0 {
+				continue
 			}
-			next := nextPerm(s)
-			if next == s {
-				break
-			}
-			s = next
+			num, _ := strconv.Atoi(string(v))
+			ret = min(ret, num)
+			break
 		}
 	}
 	return ret

@@ -15,8 +15,8 @@ func maxFrequency(nums []int, k int, numOperations int) int {
 		larger := sort.SearchInts(nums, num+k+1) - 1
 		ret = max(ret, sameSize+min(larger-smaller+1-sameSize, numOperations))
 
-		j := sort.SearchInts(nums, num+k*2+1) - 1
-		ret = max(ret, min(j-i+1, numOperations))
+		poss := sort.SearchInts(nums, num+2*k+1) - 1
+		ret = max(ret, min(poss-i+1, numOperations))
 	}
 	return ret
 }

@@ -1,19 +1,17 @@
 package main
 
 func numSub(s string) int {
-	var i int
 	var ret int
-	for i < len(s) {
+	for i := 0; i < len(s); i++ {
 		if s[i] == '0' {
-			i++
 			continue
 		}
-		oldI := i
-		for i < len(s) && s[i] == '1' {
-			i++
+		j := i + 1
+		for j < len(s) && s[j] == '1' {
+			j += 1
 		}
-		size := i - oldI
-		ret += (1 + size) * size / 2
+		ret += (j - i) * (j - i + 1) / 2
+		i = j - 1
 	}
 	return ret
 }

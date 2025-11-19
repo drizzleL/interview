@@ -4,6 +4,58 @@ import (
 	"math"
 )
 
+func maxPower2(stations []int, r int, k int) int64 {
+	var initSum, sum int
+	for i := 0; i < r; i++ {
+		sum += stations[i]
+		initSum += stations[i]
+	}
+	minPower, maxPower := math.MaxInt32, math.MinInt32
+	for i := 0; i < len(stations); i++ {
+		if i+r < len(stations) {
+			sum += stations[i+r]
+		}
+		if i-r-1 >= 0 {
+			sum -= stations[i-r-1]
+		}
+		minPower, maxPower = min(minPower, sum), max(maxPower, sum)
+	}
+	maxPower += k
+	check := func(x int) bool {
+		leftK := k
+		diff := make([]int, len(stations))
+		sum := initSum
+		for i := 0; i < len(stations); i++ {
+			if i-r-1 >= 0 {
+				sum -= diff[i-r-1]
+				sum -= stations[i-r-1]
+			}
+			if i+r < len(stations) {
+				sum += stations[i+r]
+			}
+			if sum >= x {
+				continue
+			}
+			if sum+leftK < x {
+				return false
+			}
+			diff[i+r] = x - sum
+			leftK -= x - sum
+			sum = x
+		}
+		return true
+	}
+	for minPower < maxPower {
+		mid := (1 + minPower + maxPower) / 2
+		if check(mid) {
+			minPower = mid
+		} else {
+			maxPower = mid - 1
+		}
+	}
+	return int64(minPower)
+}
+
 func maxPower(stations []int, r int, k int) int64 {
 	maxPower, minPower := math.MinInt32, math.MaxInt32
 	powers := make([]int, len(stations))
