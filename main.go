@@ -59,7 +59,7 @@ func main() {
 	defer func() {
 		log.Printf("takes %v\n", time.Since(start))
 	}()
-	p(treeQueries2(2, toIntInt(`[[1,2,7]]`), toIntInt(`[[2,2],[1,1,2,4],[2,2]]`)))
+	p(minCostGoodCaption("cdcd"))
 }
 
 func readFile(filename string) []string {

@@ -32,3 +32,28 @@ func countPalindromicSubsequence(s string) int {
 	}
 	return ret
 }
+
+func countPalindromicSubsequence2(s string) int {
+	var pre, after [26]int
+	var seen [26 * 26]bool
+	for _, c := range s {
+		after[c-'a'] += 1
+	}
+	for _, c := range s {
+		i := int(c - 'a')
+		after[c-'a'] -= 1
+		for j := 0; j < 26; j++ {
+			if pre[j] > 0 && after[j] > 0 {
+				seen[i*26+j] = true
+			}
+		}
+		pre[c-'a'] += 1
+	}
+	var ret int
+	for _, v := range seen {
+		if v {
+			ret += 1
+		}
+	}
+	return ret
+}
